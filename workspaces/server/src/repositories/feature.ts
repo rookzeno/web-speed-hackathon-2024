@@ -55,6 +55,7 @@ class FeatureRepository implements FeatureRepositoryInterface {
                   id: true,
                   name: true,
                 },
+                limit: 1,
               },
               image: {
                 columns: {

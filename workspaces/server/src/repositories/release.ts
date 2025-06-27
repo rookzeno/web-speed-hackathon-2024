@@ -49,6 +49,7 @@ class ReleaseRepository implements ReleaseRepositoryInterface {
               id: true,
               name: true,
             },
+            limit: 10,
             with: {
               author: {
                 columns: {

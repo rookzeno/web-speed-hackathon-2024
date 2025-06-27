@@ -56,6 +56,7 @@ class RankingRepository implements RankingRepositoryInterface {
                   id: true,
                   name: true,
                 },
+                limit: 1,
               },
               image: {
                 columns: {

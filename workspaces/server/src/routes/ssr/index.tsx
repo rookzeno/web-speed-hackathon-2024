@@ -28,13 +28,13 @@ async function createInjectDataStr(): Promise<Record<string, unknown>> {
   }
 
   {
-    const features = await featureApiClient.fetchList({ query: {} });
-    json[unstable_serialize(featureApiClient.fetchList$$key({ query: {} }))] = features;
+    const features = await featureApiClient.fetchList({ query: { limit: 10, offset: 0 } });
+    json[unstable_serialize(featureApiClient.fetchList$$key({ query: { limit: 10, offset: 0 } }))] = features;
   }
 
   {
-    const ranking = await rankingApiClient.fetchList({ query: {} });
-    json[unstable_serialize(rankingApiClient.fetchList$$key({ query: {} }))] = ranking;
+    const ranking = await rankingApiClient.fetchList({ query: { limit: 10, offset: 0 } });
+    json[unstable_serialize(rankingApiClient.fetchList$$key({ query: { limit: 10, offset: 0 } }))] = ranking;
   }
 
   return json;
