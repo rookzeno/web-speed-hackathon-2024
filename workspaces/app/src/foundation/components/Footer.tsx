@@ -3,11 +3,7 @@ import React, { useId } from 'react';
 import styled from 'styled-components';
 
 import { DialogContentAtom } from '../atoms/DialogContentAtom';
-import { COMPANY } from '../constants/Company';
-import { CONTACT } from '../constants/Contact';
-import { OVERVIEW } from '../constants/Overview';
-import { QUESTION } from '../constants/Question';
-import { TERM } from '../constants/Term';
+import { useTextContent } from '../hooks/useTextContent';
 import { Color, Space, Typography } from '../styles/variables';
 
 import { Box } from './Box';
@@ -38,75 +34,101 @@ export const Footer: React.FC = () => {
   const overviewDialogA11yId = useId();
 
   const updateDialogContent = useSetAtom(DialogContentAtom);
+  const { fetchTextContent } = useTextContent();
 
-  const handleRequestToTermDialogOpen = () => {
-    updateDialogContent(
-      <_Content aria-labelledby={termDialogA11yId} role="dialog">
-        <Text as="h2" color={Color.MONO_100} id={termDialogA11yId} typography={Typography.NORMAL16}>
-          利用規約
-        </Text>
-        <Spacer height={Space * 1} />
-        <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-          {TERM}
-        </Text>
-      </_Content>,
-    );
+  const handleRequestToTermDialogOpen = async () => {
+    try {
+      const content = await fetchTextContent('term');
+      updateDialogContent(
+        <_Content aria-labelledby={termDialogA11yId} role="dialog">
+          <Text as="h2" color={Color.MONO_100} id={termDialogA11yId} typography={Typography.NORMAL16}>
+            利用規約
+          </Text>
+          <Spacer height={Space * 1} />
+          <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
+            {content}
+          </Text>
+        </_Content>,
+      );
+    } catch (error) {
+      console.error('Failed to load terms content:', error);
+    }
   };
 
-  const handleRequestToContactDialogOpen = () => {
-    updateDialogContent(
-      <_Content aria-labelledby={contactDialogA11yId} role="dialog">
-        <Text as="h2" color={Color.MONO_100} id={contactDialogA11yId} typography={Typography.NORMAL16}>
-          お問い合わせ
-        </Text>
-        <Spacer height={Space * 1} />
-        <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-          {CONTACT}
-        </Text>
-      </_Content>,
-    );
+  const handleRequestToContactDialogOpen = async () => {
+    try {
+      const content = await fetchTextContent('contact');
+      updateDialogContent(
+        <_Content aria-labelledby={contactDialogA11yId} role="dialog">
+          <Text as="h2" color={Color.MONO_100} id={contactDialogA11yId} typography={Typography.NORMAL16}>
+            お問い合わせ
+          </Text>
+          <Spacer height={Space * 1} />
+          <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
+            {content}
+          </Text>
+        </_Content>,
+      );
+    } catch (error) {
+      console.error('Failed to load contact content:', error);
+    }
   };
 
-  const handleRequestToQuestionDialogOpen = () => {
-    updateDialogContent(
-      <_Content aria-labelledby={questionDialogA11yId} role="dialog">
-        <Text as="h2" color={Color.MONO_100} id={questionDialogA11yId} typography={Typography.NORMAL16}>
-          Q&A
-        </Text>
-        <Spacer height={Space * 1} />
-        <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-          {QUESTION}
-        </Text>
-      </_Content>,
-    );
+  const handleRequestToQuestionDialogOpen = async () => {
+    try {
+      const content = await fetchTextContent('question');
+      updateDialogContent(
+        <_Content aria-labelledby={questionDialogA11yId} role="dialog">
+          <Text as="h2" color={Color.MONO_100} id={questionDialogA11yId} typography={Typography.NORMAL16}>
+            Q&A
+          </Text>
+          <Spacer height={Space * 1} />
+          <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
+            {content}
+          </Text>
+        </_Content>,
+      );
+    } catch (error) {
+      console.error('Failed to load question content:', error);
+    }
   };
 
-  const handleRequestToCompanyDialogOpen = () => {
-    updateDialogContent(
-      <_Content aria-labelledby={companyDialogA11yId} role="dialog">
-        <Text as="h2" color={Color.MONO_100} id={companyDialogA11yId} typography={Typography.NORMAL16}>
-          運営会社
-        </Text>
-        <Spacer height={Space * 1} />
-        <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-          {COMPANY}
-        </Text>
-      </_Content>,
-    );
+  const handleRequestToCompanyDialogOpen = async () => {
+    try {
+      const content = await fetchTextContent('company');
+      updateDialogContent(
+        <_Content aria-labelledby={companyDialogA11yId} role="dialog">
+          <Text as="h2" color={Color.MONO_100} id={companyDialogA11yId} typography={Typography.NORMAL16}>
+            運営会社
+          </Text>
+          <Spacer height={Space * 1} />
+          <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
+            {content}
+          </Text>
+        </_Content>,
+      );
+    } catch (error) {
+      console.error('Failed to load company content:', error);
+    }
   };
 
-  const handleRequestToOverviewDialogOpen = () => {
-    updateDialogContent(
-      <_Content aria-labelledby={overviewDialogA11yId} role="dialog">
-        <Text as="h2" color={Color.MONO_100} id={overviewDialogA11yId} typography={Typography.NORMAL16}>
-          Cyber TOONとは
-        </Text>
-        <Spacer height={Space * 1} />
-        <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-          {OVERVIEW}
-        </Text>
-      </_Content>,
-    );
+  const handleRequestToOverviewDialogOpen = async () => {
+    try {
+      const content = await fetchTextContent('overview');
+      updateDialogContent(
+        <_Content aria-labelledby={overviewDialogA11yId} role="dialog">
+          <Text as="h2" color={Color.MONO_100} id={overviewDialogA11yId} typography={Typography.NORMAL16}>
+            Cyber TOONとは
+          </Text>
+          <Spacer height={Space * 1} />
+          <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
+            {content}
+          </Text>
+        </_Content>,
+      );
+    } catch (error) {
+      console.error('Failed to load overview content:', error);
+    }
   };
 
   return (
