@@ -11,7 +11,7 @@ import { Link } from '../../../foundation/components/Link';
 import { Separator } from '../../../foundation/components/Separator';
 import { Spacer } from '../../../foundation/components/Spacer';
 import { Text } from '../../../foundation/components/Text';
-import { useImage } from '../../../foundation/hooks/useImage';
+import { useLazyImage } from '../../../foundation/hooks/useLazyImage';
 import { Color, Radius, Space, Typography } from '../../../foundation/styles/variables';
 
 const _Wrapper = styled.li`
@@ -38,23 +38,43 @@ const _AvatarWrapper = styled.div`
   }
 `;
 
+const _PlaceholderImg = styled.div<{ $size: number }>`
+  width: ${({ $size }) => $size}px;
+  height: ${({ $size }) => $size}px;
+  background-color: ${Color.MONO_30};
+  border-radius: ${Radius.SMALL};
+`;
+
+const _PlaceholderAvatar = styled.div<{ $size: number }>`
+  width: ${({ $size }) => $size}px;
+  height: ${({ $size }) => $size}px;
+  background-color: ${Color.MONO_30};
+  border-radius: 50%;
+`;
+
 type Props = {
   book: GetRankingListResponse[number]['book'];
 };
 
 const RankingCard: React.FC<Props> = ({ book }) => {
-  const imageUrl = useImage({ height: 96, imageId: book.image.id, width: 96 });
-  const authorImageUrl = useImage({ height: 32, imageId: book.author.image.id, width: 32 });
+  const { imageSrc: imageUrl, ref: imgRef } = useLazyImage({ height: 96, imageId: book.image.id, width: 96 });
+  const { imageSrc: authorImageUrl, ref: avatarRef } = useLazyImage({
+    height: 32,
+    imageId: book.author.image.id,
+    width: 32,
+  });
 
   return (
     <_Wrapper>
       <_Link href={`/books/${book.id}`}>
         <Spacer height={Space * 1.5} />
         <Flex align="flex-start" gap={Space * 2.5} justify="flex-start">
-          {imageUrl != null && (
+          {imageUrl != null ? (
             <_ImgWrapper>
               <Image alt={book.name} height={96} objectFit="cover" src={imageUrl} width={96} />
             </_ImgWrapper>
+          ) : (
+            <_PlaceholderImg ref={imgRef} $size={96} />
           )}
           <Box width="100%">
             <Flex align="flex-start" direction="column" gap={Space * 1} justify="flex-start">
@@ -69,7 +89,7 @@ const RankingCard: React.FC<Props> = ({ book }) => {
             <Spacer height={Space * 1} />
 
             <Flex align="center" gap={Space * 1} justify="flex-end">
-              {authorImageUrl != null && (
+              {authorImageUrl != null ? (
                 <_AvatarWrapper>
                   <Image
                     alt={`${book.author.name}のアイコン`}
@@ -79,6 +99,8 @@ const RankingCard: React.FC<Props> = ({ book }) => {
                     width={32}
                   />
                 </_AvatarWrapper>
+              ) : (
+                <_PlaceholderAvatar ref={avatarRef} $size={32} />
               )}
               <Text color={Color.MONO_80} typography={Typography.NORMAL12}>
                 {book.author.name}

@@ -7,7 +7,7 @@ import { Link } from '../../../foundation/components/Link';
 import { Separator } from '../../../foundation/components/Separator';
 import { Spacer } from '../../../foundation/components/Spacer';
 import { Text } from '../../../foundation/components/Text';
-import { useImage } from '../../../foundation/hooks/useImage';
+import { useLazyImage } from '../../../foundation/hooks/useLazyImage';
 import { Color, Radius, Space, Typography } from '../../../foundation/styles/variables';
 import { useBook } from '../hooks/useBook';
 
@@ -27,6 +27,13 @@ const _ImgWrapper = styled.div`
   }
 `;
 
+const _PlaceholderImg = styled.div<{ $size: number }>`
+  width: ${({ $size }) => $size}px;
+  height: ${({ $size }) => $size}px;
+  background-color: ${Color.MONO_30};
+  border-radius: ${Radius.SMALL};
+`;
+
 type Props = {
   bookId: string;
 };
@@ -34,17 +41,19 @@ type Props = {
 export const BookListItem: React.FC<Props> = ({ bookId }) => {
   const { data: book } = useBook({ params: { bookId } });
 
-  const imageUrl = useImage({ height: 64, imageId: book.image.id, width: 64 });
+  const { imageSrc: imageUrl, ref: imgRef } = useLazyImage({ height: 64, imageId: book.image.id, width: 64 });
 
   return (
     <_Wrapper>
       <_Link href={`/books/${book.id}`}>
         <Spacer height={Space * 1.5} />
         <Flex align="flex-start" gap={Space * 2.5} justify="flex-start">
-          {imageUrl != null && (
+          {imageUrl != null ? (
             <_ImgWrapper>
               <Image alt={book.name} height={64} objectFit="cover" src={imageUrl} width={64} />
             </_ImgWrapper>
+          ) : (
+            <_PlaceholderImg ref={imgRef} $size={64} />
           )}
           <Box width="100%">
             <Flex align="flex-start" direction="column" gap={Space * 1} justify="flex-start">

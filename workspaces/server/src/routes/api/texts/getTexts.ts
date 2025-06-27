@@ -14,8 +14,8 @@ const ParamsSchema = z.object({
 });
 
 const ResponseSchema = z.object({
-  type: z.string(),
   content: z.string(),
+  type: z.string(),
 });
 
 const route = createRoute({
@@ -63,7 +63,7 @@ app.openapi(route, async (c) => {
       return c.json({ error: 'Invalid text type' }, 404);
   }
 
-  return c.json({ type, content });
+  return c.json({ content, type });
 });
 
 export { app as getTextsApp };

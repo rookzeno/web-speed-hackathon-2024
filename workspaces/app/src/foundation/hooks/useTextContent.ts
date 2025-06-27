@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 type TextType = 'term' | 'contact' | 'question' | 'company' | 'overview';
 
@@ -9,7 +9,7 @@ export const useTextContent = () => {
   const fetchTextContent = useCallback(async (type: TextType): Promise<string> => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch(`/api/v1/texts/${type}`);
       if (!response.ok) {
@@ -26,8 +26,8 @@ export const useTextContent = () => {
   }, []);
 
   return {
+    error,
     fetchTextContent,
     loading,
-    error,
   };
 };

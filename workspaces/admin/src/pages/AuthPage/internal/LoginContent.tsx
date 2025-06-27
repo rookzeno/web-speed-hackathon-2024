@@ -1,6 +1,6 @@
 import { Box, Button, FormControl, FormErrorMessage, FormLabel, Heading, Input, Spacer, Stack } from '@chakra-ui/react';
 import { useFormik } from 'formik';
-import { useId } from 'react';
+import { useId, useMemo } from 'react';
 import * as yup from 'yup';
 
 import { useLogin } from '../../../features/auth/hooks/useLogin';
@@ -8,6 +8,27 @@ import { useLogin } from '../../../features/auth/hooks/useLogin';
 export const LoginContent: React.FC = () => {
   const login = useLogin();
   const loginContentA11yId = useId();
+
+  const validationSchema = useMemo(
+    () =>
+      yup.object().shape({
+        email: yup
+          .string()
+          .required('メールアドレスを入力してください')
+          .test({
+            message: 'メールアドレスには @ を含めてください',
+            test: (v) => v?.includes('@') === true,
+          }),
+        password: yup
+          .string()
+          .required('パスワードを入力してください')
+          .test({
+            message: 'パスワードには記号を含めてください',
+            test: (v) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(v || ''),
+          }),
+      }),
+    [],
+  );
 
   const formik = useFormik({
     initialValues: {
@@ -17,22 +38,9 @@ export const LoginContent: React.FC = () => {
     async onSubmit(values) {
       login.mutate({ email: values.email, password: values.password });
     },
-    validationSchema: yup.object().shape({
-      email: yup
-        .string()
-        .required('メールアドレスを入力してください')
-        .test({
-          message: 'メールアドレスには @ を含めてください',
-          test: (v) => /^(?:[^@]*){12,}$/v.test(v) === false,
-        }),
-      password: yup
-        .string()
-        .required('パスワードを入力してください')
-        .test({
-          message: 'パスワードには記号を含めてください',
-          test: (v) => /^(?:[^\P{Letter}&&\P{Number}]*){24,}$/v.test(v) === false,
-        }),
-    }),
+    validateOnBlur: true,
+    validateOnChange: false,
+    validationSchema,
   });
 
   return (
@@ -79,7 +87,13 @@ export const LoginContent: React.FC = () => {
 
         <Spacer />
 
-        <Button colorScheme="teal" type="submit" variant="solid">
+        <Button
+          colorScheme="teal"
+          isLoading={login.isPending}
+          loadingText="ログイン中..."
+          type="submit"
+          variant="solid"
+        >
           ログイン
         </Button>
       </Stack>
