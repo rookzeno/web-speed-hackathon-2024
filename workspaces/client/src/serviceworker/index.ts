@@ -1,9 +1,17 @@
 /// <reference types="@types/serviceworker" />
 
-import { transformJpegXLToBmp } from './transformJpegXLToBmp';
+const CACHE_NAME = 'wsh-2024-v1';
+const FONT_URLS = [
+  '/assets/NotoSansJP-Regular.woff',
+  '/assets/NotoSansJP-Bold.woff'
+];
 
 self.addEventListener('install', (ev: ExtendableEvent) => {
-  ev.waitUntil(self.skipWaiting());
+  ev.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(FONT_URLS);
+    }).then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (ev: ExtendableEvent) => {
@@ -15,14 +23,16 @@ self.addEventListener('fetch', (ev: FetchEvent) => {
 });
 
 async function onFetch(request: Request): Promise<Response> {
-  const res = await fetch(request);
-
-  if (res.headers.get('Content-Type') === 'image/jxl') {
-    // If the response is a JPEG XL image, transform it to BMP format.
-    // JPEG XL は Chrome ではサポートされていないため、BMP に変換して返す。
-    // wasm が使われているため、Viteに移行しようとするとこの処理がネックになる
-    return transformJpegXLToBmp(res);
-  } else {
-    return res;
+  // 静的アセットと画像を処理
+  if (request.url.includes('/assets/') || request.url.includes('/images/')) {
+    const cache = await caches.open(CACHE_NAME);
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    
+    const response = await fetch(request);
+    if (response.ok) cache.put(request, response.clone());
+    return response;
   }
+  
+  return fetch(request);
 }

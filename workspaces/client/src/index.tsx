@@ -4,23 +4,29 @@ import { SWRConfig } from 'swr';
 
 import { ClientApp } from '@wsh-2024/app/src/index';
 
-import { preloadImages } from './utils/preloadImages';
 import { registerServiceWorker } from './utils/registerServiceWorker';
 
 const main = async () => {
-  document.addEventListener('DOMContentLoaded', () => {
-    ReactDOM.hydrateRoot(
-      document.getElementById('root')!,
-      <SWRConfig value={{ revalidateIfStale: true, revalidateOnFocus: false, revalidateOnReconnect: false }}>
-        <BrowserRouter>
-          <ClientApp />
-        </BrowserRouter>
-      </SWRConfig>,
-    );
-  });
-
-  await preloadImages();
-  await registerServiceWorker();
+  // Service Workerを最初に登録
+  await registerServiceWorker().catch(console.error);
+  
+  // DOMが既に読み込まれている場合は即座に実行
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', hydrateApp, { once: true });
+  } else {
+    hydrateApp();
+  }
 };
 
-main().catch(console.error);
+const hydrateApp = () => {
+  ReactDOM.hydrateRoot(
+    document.getElementById('root')!,
+    <SWRConfig value={{ revalidateIfStale: true, revalidateOnFocus: false, revalidateOnReconnect: false }}>
+      <BrowserRouter>
+        <ClientApp />
+      </BrowserRouter>
+    </SWRConfig>,
+  );
+};
+
+main();

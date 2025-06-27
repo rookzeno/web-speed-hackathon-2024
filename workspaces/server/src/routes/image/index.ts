@@ -100,9 +100,9 @@ app.get(
     if (!isSupportedImageFormat(origImgFormat)) {
       throw new HTTPException(500, { message: 'Failed to load image.' });
     }
-    if (resImgFormat === origImgFormat && c.req.valid('query').width == null && c.req.valid('query').height == null) {
-      // 画像変換せずにそのまま返す
-      c.header('Content-Type', IMAGE_MIME_TYPE[resImgFormat]);
+    // リサイズ指定がない場合は常にそのまま返す（高速化）
+    if (c.req.valid('query').width == null && c.req.valid('query').height == null) {
+      c.header('Content-Type', IMAGE_MIME_TYPE[origImgFormat]);
       return c.body(createStreamBody(createReadStream(origFilePath)));
     }
 

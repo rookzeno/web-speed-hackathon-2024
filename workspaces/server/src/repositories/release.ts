@@ -72,6 +72,8 @@ class ReleaseRepository implements ReleaseRepositoryInterface {
                   id: true,
                   name: true,
                 },
+                limit: 5, // 最初の5話のみ取得してパフォーマンス向上
+                orderBy: (episodes, { asc }) => [asc(episodes.chapter)],
               },
               image: {
                 columns: {
