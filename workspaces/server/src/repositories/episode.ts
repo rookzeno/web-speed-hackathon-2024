@@ -30,6 +30,43 @@ type EpisodeRepositoryInterface = {
 };
 
 class EpisodeRepository implements EpisodeRepositoryInterface {
+  async readPages(options: { params: GetEpisodeRequestParams }): Promise<Result<{ pages: Array<{ id: string; page: number; image: { id: string; alt: string } }> }, HTTPException>> {
+    try {
+      const data = await getDatabase().query.episode.findFirst({
+        columns: { id: true },
+        where(episode, { eq }) {
+          return eq(episode.id, options.params.episodeId);
+        },
+        with: {
+          pages: {
+            columns: {
+              id: true,
+              page: true,
+            },
+            with: {
+              image: {
+                columns: {
+                  alt: true,
+                  id: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (data == null) {
+        throw new HTTPException(404, { message: `Episode:${options.params.episodeId} is not found` });
+      }
+      
+      return ok({ pages: data.pages });
+    } catch (cause) {
+      if (cause instanceof HTTPException) {
+        return err(cause);
+      }
+      return err(new HTTPException(500, { cause, message: `Failed to read episode pages:${options.params.episodeId}.` }));
+    }
+  }
   async read(options: { params: GetEpisodeRequestParams }): Promise<Result<GetEpisodeResponse, HTTPException>> {
     try {
       const data = await getDatabase().query.episode.findFirst({
@@ -81,27 +118,13 @@ class EpisodeRepository implements EpisodeRepositoryInterface {
               id: true,
             },
           },
-          pages: {
-            columns: {
-              id: true,
-              page: true,
-            },
-            with: {
-              image: {
-                columns: {
-                  alt: true,
-                  id: true,
-                },
-              },
-            },
-          },
         },
       });
 
       if (data == null) {
         throw new HTTPException(404, { message: `Episode:${options.params.episodeId} is not found` });
       }
-      return ok(data);
+      return ok({ ...data, pages: [] });
     } catch (cause) {
       if (cause instanceof HTTPException) {
         return err(cause);

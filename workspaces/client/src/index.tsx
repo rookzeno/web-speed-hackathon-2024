@@ -19,9 +19,25 @@ const main = async () => {
 };
 
 const hydrateApp = () => {
+  const injectDataElement = document.getElementById('inject-data');
+  let fallback = {};
+  
+  if (injectDataElement && injectDataElement.textContent) {
+    try {
+      fallback = JSON.parse(injectDataElement.textContent);
+    } catch (error) {
+      console.error('Failed to parse inject data:', error);
+    }
+  }
+  
   ReactDOM.hydrateRoot(
     document.getElementById('root')!,
-    <SWRConfig value={{ revalidateIfStale: true, revalidateOnFocus: false, revalidateOnReconnect: false }}>
+    <SWRConfig value={{ 
+      fallback,
+      revalidateIfStale: true, 
+      revalidateOnFocus: false, 
+      revalidateOnReconnect: false 
+    }}>
       <BrowserRouter>
         <ClientApp />
       </BrowserRouter>
