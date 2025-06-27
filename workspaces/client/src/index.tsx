@@ -4,6 +4,7 @@ import { SWRConfig } from 'swr';
 
 import { ClientApp } from '@wsh-2024/app/src/index';
 
+import { preloadImages } from './utils/preloadImages';
 import { registerServiceWorker } from './utils/registerServiceWorker';
 
 const main = async () => {
@@ -18,6 +19,7 @@ const main = async () => {
     );
   });
 
+  await preloadImages();
   await registerServiceWorker();
 };
 
